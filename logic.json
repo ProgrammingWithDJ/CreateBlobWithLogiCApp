@@ -1,0 +1,77 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Create_blob_(V2)_2": {
+                "inputs": {
+                    "body": "Hello Senapati @{triggerOutputs()['relativePathParameters']['Name']}",
+                    "headers": {
+                        "ReadFileMetadataFromServer": true
+                    },
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azureblob']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('AccountNameFromSettings'))}/files",
+                    "queries": {
+                        "folderPath": "/log",
+                        "name": "@{triggerOutputs()['relativePathParameters']['Name']}.txt",
+                        "queryParametersSingleEncoded": true
+                    }
+                },
+                "runAfter": {},
+                "runtimeConfiguration": {
+                    "contentTransfer": {
+                        "transferMode": "Chunked"
+                    }
+                },
+                "type": "ApiConnection"
+            },
+            "Response": {
+                "inputs": {
+                    "body": "Hello @{triggerOutputs()['relativePathParameters']['Name']}",
+                    "statusCode": 200
+                },
+                "kind": "Http",
+                "runAfter": {
+                    "Create_blob_(V2)_2": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Response"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "defaultValue": {},
+                "type": "Object"
+            }
+        },
+        "triggers": {
+            "manual": {
+                "inputs": {
+                    "method": "GET",
+                    "relativePath": "/{Name}",
+                    "schema": {}
+                },
+                "kind": "Http",
+                "type": "Request"
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "value": {
+                "azureblob": {
+                    "connectionId": "/subscriptions/xxx/resourceGroups/logicApplearningRg/providers/Microsoft.Web/connections/azureblob-1",
+                    "connectionName": "azureblob-1",
+                    "id": "/subscriptions/xxx/providers/Microsoft.Web/locations/centralus/managedApis/azureblob"
+                }
+            }
+        }
+    }
+}
